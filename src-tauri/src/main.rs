@@ -3,7 +3,7 @@
 
 mod star_notifier;
 
-use tauri::{SystemTray,CustomMenuItem, SystemTrayMenu,Builder,SystemTrayEvent};
+use tauri::{SystemTray,CustomMenuItem, SystemTrayMenu,SystemTrayEvent};
 use tauri::Manager;
 use std::sync::{Arc, Mutex};
 
@@ -11,12 +11,7 @@ use std::sync::{Arc, Mutex};
 
 fn main() {
 
-    let state = Arc::new(Mutex::new(star_notifier::AppState {
-        username: None,
-        token: None,
-        period: None,
-        is_running: false
-    }));
+    let state = Arc::new(Mutex::new(star_notifier::AppState::new()));
 
     let quit: CustomMenuItem = CustomMenuItem::new("quit".to_string(), "退出");
     let star_notifier = CustomMenuItem::new("StarNotifier".to_string(), "github star通知器");
