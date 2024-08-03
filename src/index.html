@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri App</title>
+    <script type="module" src="/main.js" defer></script>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <form class="row" id="greet-form">
+        <!-- <input id="greet-input" placeholder="Enter a name..." />
+        <button type="submit">Greet</button> -->
+
+        <label>github用户</label>
+        <input type="text" id="username" placeholder="输入用户名">
+
+        <p>
+
+        <label for="token">token</label>
+        <input type="text" id="token" placeholder="输入token(可选)">
+
+        <p>
+
+        <label for="period">频率(秒)</label>
+        <input type="text" id="period" placeholder="输入频率(单位:秒)"  value="120">
+
+
+        <div class="form-group">
+            <button id="startButton" >开始</button>
+        </div>
+
+
+
+      </form>
+
+      <p id="greet-msg"></p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+   body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e4e2e2;
+        }
+ 
+
+        .form-group {
+          display: flex;
+          justify-content: center;
+      }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            width: 40%;
+            padding: 3px;
+            border-radius: 5px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .status-message {
+            font-size: 13px;
+            color: gray;
+          }
+
+          .btn-start {
+            background-color: #007bff !important;
+            color: white;
+          }
+          .btn-stop {
+            background-color: rgb(204, 40, 40) !important;
+            color: white;
+          }
+
+   
