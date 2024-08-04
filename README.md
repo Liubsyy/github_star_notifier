@@ -4,4 +4,4 @@
 ![](./img/mac_github_star_motifier.png)
 
 windows效果如下：
-![](./img/mac_github_star_motifier_windows.png)
+![](./img/github_star_notifier_win.png)
