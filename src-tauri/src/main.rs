@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod star_notifier;
+mod file_store;
 
 use tauri::{SystemTray,CustomMenuItem, SystemTrayMenu,SystemTrayEvent};
 use tauri::Manager;
@@ -10,6 +11,12 @@ use std::sync::{Arc, Mutex};
 
 
 fn main() {
+
+  // notify_rust::Notification::new()
+  //       .summary("桌面通知")
+  //       .body("这是一个跨平台的桌面通知示例")
+  //       .show()
+  //       .unwrap();
 
     let state = Arc::new(Mutex::new(star_notifier::AppState::new()));
 
@@ -53,8 +60,26 @@ fn main() {
                     let window = app.get_window("main").unwrap();
                     window.show().unwrap();
                     window.set_focus().unwrap();
+
+                    match file_store::load() {
+                      Ok(file_data) => {
+                        window.emit("file-data", file_data).unwrap();
+                      }
+                      Err(e) => {
+                          eprintln!("Failed to read file data: {}", e);
+                      }
+                  }
                 }
                 "quit" => {
+                    /*let main_window = app.get_window("main").unwrap();
+                    match file_store::load() {
+                        Ok(file_data) => {
+                            main_window.emit("file-data", file_data).unwrap();
+                        }
+                        Err(e) => {
+                            eprintln!("Failed to read file data: {}", e);
+                        }
+                    }*/
                     std::process::exit(0);
                 }
                 _ => {}
@@ -73,6 +98,7 @@ fn main() {
         .setup(|app| {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+          
             Ok(())
         }).run(tauri::generate_context!())
         .expect("error while running tauri application");

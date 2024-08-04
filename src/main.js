@@ -1,8 +1,15 @@
 const { invoke } = window.__TAURI__.tauri;
+const { listen } = window.__TAURI__.event;
 
 let usernameInput;
 let tokenInput;
 let periodInput;
+
+function updateInputs(data) {
+  usernameInput.value = data.username;
+  tokenInput.value = data.token;
+  periodInput.value = data.period;
+}
 
 async function greet() {
 
@@ -41,4 +48,9 @@ window.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     greet();
   });
+
+  listen('file-data', event => {
+    updateInputs(event.payload);
+  });
+
 });
