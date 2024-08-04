@@ -13,10 +13,8 @@
       "iconPath": "icons/star.png"
     },
     "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
+      "dialog": {
+        "all": true
       }
     },
     "windows": [

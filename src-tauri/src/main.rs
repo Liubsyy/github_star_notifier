@@ -12,11 +12,6 @@ use std::sync::{Arc, Mutex};
 
 fn main() {
 
-  // notify_rust::Notification::new()
-  //       .summary("桌面通知")
-  //       .body("这是一个跨平台的桌面通知示例")
-  //       .show()
-  //       .unwrap();
 
     let state = Arc::new(Mutex::new(star_notifier::AppState::new()));
 
@@ -98,7 +93,10 @@ fn main() {
         .setup(|app| {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-          
+
+            let app_handle = app.handle();
+            app.manage(app_handle.clone());
+
             Ok(())
         }).run(tauri::generate_context!())
         .expect("error while running tauri application");

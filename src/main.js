@@ -1,6 +1,5 @@
 const { invoke } = window.__TAURI__.tauri;
 const { listen } = window.__TAURI__.event;
-
 let usernameInput;
 let tokenInput;
 let periodInput;
@@ -12,6 +11,18 @@ function updateInputs(data) {
 }
 
 async function greet() {
+
+  if(usernameInput.value=='' || periodInput.value==''){
+    window.__TAURI__.dialog.message("github用户和频率必须填写","未填写信息");
+    return;
+  }
+
+  if(!isNaN(parseInt(periodInput.value))) {
+    window.__TAURI__.dialog.message("请正确填写频率：秒","填写错误");
+    return;
+  }
+
+
 
   invoke("toggle_state", { username: usernameInput.value, token:tokenInput.value,period: parseInt(periodInput.value)})
   .then((isRunning) => {

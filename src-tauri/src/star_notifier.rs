@@ -7,7 +7,6 @@ use serde::Deserialize;
 use crate::file_store;
 use tokio::runtime::Runtime;
 
-use notify_rust::Notification;
 
 pub struct AppState {
     pub username: Option<String>,
@@ -80,6 +79,7 @@ async fn fetch_repos(username: &str, token: &str) -> Result<Vec<Repo>, Error> {
 #[tauri::command]
 pub fn toggle_state(
     state: tauri::State<'_, Arc<Mutex<AppState>>>,
+    app_handle: tauri::AppHandle,
     username: String,
     token: String,
     period: u32,
@@ -89,6 +89,7 @@ pub fn toggle_state(
     app_state.username = Some(username.clone());
     app_state.token = Some(token.clone());
     app_state.period = Some(period);
+
 
     if app_state.is_running {
         // Stop the running thread
@@ -108,10 +109,12 @@ pub fn toggle_state(
         let period = period;
         let state = Arc::clone(&state);
         let handle = thread::spawn(move || {
+     
+
             let rt = Runtime::new().unwrap();
             loop {
                 {
-                    
+               
                     let app_state = state.lock().unwrap();
                     
                     //查询github接口获取数据
@@ -158,14 +161,23 @@ pub fn toggle_state(
                                         );
                                     
                                         // 通知
-                                        Notification::new()
-                                            .summary("Github通知")
-                                            .body(&format!(
-                                               "[{}] Stars: {}{}, Forks: {}{}",
-                                                repo.full_name, repo.stargazers_count, star_message, repo.forks_count, fork_message
-                                            ))
-                                            .show()
-                                            .unwrap();
+                                        tauri::api::notification::Notification::new(&app_handle.config().tauri.bundle.identifier)
+                                        .title("Github通知")
+                                        .body(&format!(
+                                            "[{}] Stars: {}{}, Forks: {}{}",
+                                             repo.full_name, repo.stargazers_count, star_message, repo.forks_count, fork_message
+                                         ))
+                                        .show()
+                                        .unwrap();
+                                       
+                                        // notify_rust::Notification::new()
+                                        //     .summary("Github通知")
+                                        //     .body(&format!(
+                                        //        "[{}] Stars: {}{}, Forks: {}{}",
+                                        //         repo.full_name, repo.stargazers_count, star_message, repo.forks_count, fork_message
+                                        //     ))
+                                        //     .show()
+                                        //     .unwrap();
                                     }
                                 } else {
                                     println!(
