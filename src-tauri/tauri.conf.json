@@ -34,7 +34,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "com.liubs.github.star.notifier",
       "icon": [
         "icons/star.png"
       ]
