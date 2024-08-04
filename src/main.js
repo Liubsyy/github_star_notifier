@@ -17,7 +17,7 @@ async function greet() {
     return;
   }
 
-  if(!isNaN(parseInt(periodInput.value))) {
+  if(!isInteger(periodInput.value)) {
     window.__TAURI__.dialog.message("请正确填写频率：秒","填写错误");
     return;
   }
@@ -49,6 +49,11 @@ async function greet() {
   })
   .catch((error) => console.error(error))
 
+}
+
+function isInteger(value) {
+  const number = Number(value);
+  return Number.isInteger(number);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
