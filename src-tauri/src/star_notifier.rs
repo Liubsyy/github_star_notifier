@@ -138,7 +138,7 @@ pub fn toggle_state(
                                     
                                     if star_increasement!=0 || fork_increasement!=0 {
                                         let star_message = if star_increasement > 0 {
-                                            format!("+({})", star_increasement)
+                                            format!("(+{})", star_increasement)
                                         } else if star_increasement < 0 {
                                             format!("({})", star_increasement)
                                         } else {
@@ -147,7 +147,7 @@ pub fn toggle_state(
                                     
                                     
                                         let fork_message = if fork_increasement > 0 {
-                                            format!("+({})", fork_increasement)
+                                            format!("(+{})", fork_increasement)
                                         } else if fork_increasement < 0 {
                                             format!("({})", fork_increasement)
                                         } else {
