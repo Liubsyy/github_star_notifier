@@ -108,7 +108,7 @@ pub fn toggle_state(
 
         let period = period;
         let state = Arc::clone(&state);
-        let handle = thread::spawn(move || {
+                let handle = thread::spawn(move || {
      
 
             let rt = Runtime::new().unwrap();
@@ -126,82 +126,87 @@ pub fn toggle_state(
                     println!("Processing task for user: {}, token: {}", username, token);
 
                     // 查询github接口获取数据
-                    let repos = rt.block_on(fetch_repos(&username, &token)).unwrap();
+                    //let repos = rt.block_on(fetch_repos(&username, &token)).unwrap();
               
-                    //和上一次文件数据进行差值比对
-                    match file_store::load() {
-                        Ok(last_star_info) => {
-                            for repo in &repos {
-                                if let Some(last_info) = last_star_info.projects.iter().find(|p| p.project_name == repo.full_name) {
-                                    let star_increasement = repo.stargazers_count as i32 - last_info.star as i32;
-                                    let fork_increasement = repo.forks_count as i32 - last_info.fork as i32;
-                                    
-                                    if star_increasement!=0 || fork_increasement!=0 {
-                                        let star_message = if star_increasement > 0 {
-                                            format!("(+{})", star_increasement)
-                                        } else if star_increasement < 0 {
-                                            format!("({})", star_increasement)
-                                        } else {
-                                            String::new()
-                                        };
-                                    
-                                    
-                                        let fork_message = if fork_increasement > 0 {
-                                            format!("(+{})", fork_increasement)
-                                        } else if fork_increasement < 0 {
-                                            format!("({})", fork_increasement)
-                                        } else {
-                                            String::new()
-                                        };
-                                    
-                                        // 打印差值
-                                        println!(
-                                            "[{}] Stars: {}{}, Forks: {}{}",
-                                            repo.full_name, repo.stargazers_count, star_message, repo.forks_count, fork_message
-                                        );
-                                    
-                                        // 通知
-                                        tauri::api::notification::Notification::new(&app_handle.config().tauri.bundle.identifier)
-                                        .title("Github通知")
-                                        .body(&format!(
-                                            "[{}] Stars: {}{}, Forks: {}{}",
-                                             repo.full_name, repo.stargazers_count, star_message, repo.forks_count, fork_message
-                                         ))
-                                        .show()
-                                        .unwrap();
-                                       
-                                        // notify_rust::Notification::new()
-                                        //     .summary("Github通知")
-                                        //     .body(&format!(
-                                        //        "[{}] Stars: {}{}, Forks: {}{}",
-                                        //         repo.full_name, repo.stargazers_count, star_message, repo.forks_count, fork_message
-                                        //     ))
-                                        //     .show()
-                                        //     .unwrap();
+                    match rt.block_on(fetch_repos(&username, &token)) {
+                        Ok(repos) => {
+                                //和上一次文件数据进行差值比对
+                                match file_store::load() {
+                                    Ok(last_star_info) => {
+                                        for repo in &repos {
+                                            if let Some(last_info) = last_star_info.projects.iter().find(|p| p.project_name == repo.full_name) {
+                                                let star_increasement = repo.stargazers_count as i32 - last_info.star as i32;
+                                                let fork_increasement = repo.forks_count as i32 - last_info.fork as i32;
+                                                
+                                                if star_increasement!=0 || fork_increasement!=0 {
+                                                    let star_message = if star_increasement > 0 {
+                                                        format!("(+{})", star_increasement)
+                                                    } else if star_increasement < 0 {
+                                                        format!("({})", star_increasement)
+                                                    } else {
+                                                        String::new()
+                                                    };
+                                                
+                                                
+                                                    let fork_message = if fork_increasement > 0 {
+                                                        format!("(+{})", fork_increasement)
+                                                    } else if fork_increasement < 0 {
+                                                        format!("({})", fork_increasement)
+                                                    } else {
+                                                        String::new()
+                                                    };
+                                                
+                                                    // 打印差值
+                                                    println!(
+                                                        "[{}] Stars: {}{}, Forks: {}{}",
+                                                        repo.full_name, repo.stargazers_count, star_message, repo.forks_count, fork_message
+                                                    );
+                                                
+                                                    // 通知
+                                                    tauri::api::notification::Notification::new(&app_handle.config().tauri.bundle.identifier)
+                                                    .title("Github通知")
+                                                    .body(&format!(
+                                                        "[{}] Stars: {}{}, Forks: {}{}",
+                                                        repo.full_name, repo.stargazers_count, star_message, repo.forks_count, fork_message
+                                                    ))
+                                                    .show()
+                                                    .unwrap();
+                                                
+                                                    // notify_rust::Notification::new()
+                                                    //     .summary("Github通知")
+                                                    //     .body(&format!(
+                                                    //        "[{}] Stars: {}{}, Forks: {}{}",
+                                                    //         repo.full_name, repo.stargazers_count, star_message, repo.forks_count, fork_message
+                                                    //     ))
+                                                    //     .show()
+                                                    //     .unwrap();
+                                                }
+                                            } else {
+                                                println!(
+                                                    "Repo: {}, Stars: {}, Forks: {}",
+                                                    repo.full_name, repo.stargazers_count, repo.forks_count
+                                                );
+                                            }
+                                        }
+                                    },
+                                    Err(e) => {
+                                        eprintln!("Failed to load last star info: {}", e);
                                     }
-                                } else {
-                                    println!(
-                                        "Repo: {}, Stars: {}, Forks: {}",
-                                        repo.full_name, repo.stargazers_count, repo.forks_count
-                                    );
                                 }
-                            }
-                        },
-                        Err(e) => {
-                            eprintln!("Failed to load last star info: {}", e);
+
+                                //写入结果到文件
+                                let mut star_info = file_store::StarInfo::new(username.clone(), token.clone(), period);
+                                for repo in &repos {
+                                    star_info.add_project(repo.full_name.clone(), repo.stargazers_count, repo.forks_count);
+                                }
+                                if let Err(e) = file_store::save(&star_info) {
+                                    eprintln!("Failed to save star info: {}", e);
+                                }
                         }
-                    }
-
-                    //写入结果到文件
-                    let mut star_info = file_store::StarInfo::new(username.clone(), token.clone(), period);
-                    for repo in &repos {
-                        star_info.add_project(repo.full_name.clone(), repo.stargazers_count, repo.forks_count);
-                    }
-                    if let Err(e) = file_store::save(&star_info) {
-                        eprintln!("Failed to save star info: {}", e);
-                    }
-                    
-
+                        Err(e) => {
+                            eprintln!("Error fetching repositories: {:?}", e);
+                        }
+                    };
 
                 }
 
